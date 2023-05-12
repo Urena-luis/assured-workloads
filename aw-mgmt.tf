@@ -58,11 +58,6 @@ resource "google_project_service" "aw_api_service" {
     "cloudbilling.googleapis.com",
     "iam.googleapis.com",
     "cloudbuild.googleapis.com",
-
-    ## For VPC-SC Add-On
-    "cloudresourcemanager.googleapis.com",
-    "cloudfunctions.googleapis.com",
-    "accesscontextmanager.googleapis.com",
   ])
 
   service = each.key
@@ -126,14 +121,6 @@ resource "null_resource" "del_aw" {
     aw_id   = "${google_assured_workloads_workload.abc_app_aw.id}"
     id      = "${google_assured_workloads_workload.abc_app_aw.resources[0].resource_id}"
   }
-
-  # provisioner "local-exec" {
-  #   command = <<EOT
-  #gcloud config set project ${google_project.aw_mgmt_project_id.project_id}
-  #gcloud config unset project
-  #   EOT
-  #  }
-
 
   provisioner "local-exec" {
     when    = destroy
