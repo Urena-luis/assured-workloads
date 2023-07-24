@@ -92,33 +92,3 @@ resource "google_organization_iam_member" "folder_editor" {
   member     = "serviceAccount:${google_service_account.watcher.email}"
   depends_on = [google_service_account.watcher]
 }
-
-
-module "localhost_function" {
-
-  source = "terraform-google-modules/event-function/google"
-
-  description = "Adds projects to VPC service permiterer."
-  entry_point = "handler"
-
-  environment_variables = {
-    FOLDER_ID = "${google_assured_workloads_workload.abc_app_aw.resources[0].resource_id}"
-
-  }
-
-  event_trigger    = module.event_folder_log_entry.function_event_trigger
-  name             = local.watcher_name
-  project_id       = google_project.aw_mgmt_project_id.project_id
-  region           = var.network_region
-  source_directory = abspath(path.module)
-  # "${path.module}/watcher_function_source"
-  #abspath(path.module)
-  runtime               = "python37"
-  available_memory_mb   = 2048
-  timeout_s             = 540
-  service_account_email = google_service_account.watcher.email
-  ingress_settings      = "ALLOW_INTERNAL_AND_GCLB"
-  depends_on            = [google_access_context_manager_service_perimeter.service_perimeter]
-}
-
-
