@@ -1,6 +1,6 @@
 ```
 This is not an officially supported Google product.
-This code creates PoC demo environment for CSA IL4 Assured Workload with VPC service perimeter. This demo code is not built for production workload. 
+This code creates a proof of concept demo environment for an Assured Workloads folder. This demo code is not built for production workloads. 
 ```
 
 # Compliance in Australia with Assured Workloads Architecture Guide
@@ -113,8 +113,6 @@ terraform apply
 
 # Best Practices
 
-We recommend you familiarize yourself with Google Cloud's recommended process to configure and enforce VPC-SC protection in your Google Cloud organization [by reading this document.](https://cloud.google.com/vpc-service-controls/docs/enable) Careless enablement of VPC-SC can cause problems with existing applications and can cause an outage. 
-
 We also strongly recommend that you do not nest an Assured Workloads folder within another Assured Workloads folder - even if they are the same compliance framework - as this will cause errors. You can, however, nest Assured Workloads folders and non-Assured Workloads folders with each other.
 
 We also recommend you set up logging and alerts for any changes to the Assured Workloads folder or according IAM permissions, including Org Admin changes. These alerts should be routed to an appropriate stakeholder other than Org Admin. This is because Org Admin can change the org level policies that are important for continuing compliance.
@@ -167,11 +165,6 @@ Google Cloud supports multiple TLS protocol versions. To meet compliance require
       <td>Premium Subscription, IL4</td>
       <td>20% uplift based on spend within the Assured Workloads folder</td>
     </tr>
-    <tr>
-      <td>VPC Service Controls</td>
-      <td></td>
-      <td>Free</td>
-    </tr>
   </tbody>
 </table>
 
@@ -185,85 +178,3 @@ The cost estimate may change with time and may vary per region, please review th
 -  [Control Data Access using Access Approval](https://cloud.google.com/assured-workloads/docs/access-approval)
 -  [Supported Products](https://cloud.google.com/assured-workloads/docs/supported-products)
 # 
-
-
-
-
-
-
-
-#Remove the below:
-# CSA Guide
-This Cloud Security Architecture uses terraform to setup IL4 Assured Workload with VPC service perimeter demo in a parent folder and underlying infrastructure using Google Cloud Services like [Assured Workload](https://cloud.google.com/assured-workloads), [Cloud Function](https://cloud.google.com/functions), [Access Context Manager](https://cloud.google.com/access-context-manager), [Cloud Key Management](https://cloud.google.com/security-key-management), [Compute Engine](https://cloud.google.com/compute), [BigQuery](https://cloud.google.com/bigquery), [Compute Storage](https://cloud.google.com/storage)  and [Cloud Logging](https://cloud.google.com/logging).
-
-
-## CSA Architecture Diagram
-The image below describes the architecture of IL4 Assured Workload with VPC service perimeter.
-
-![Architecture Diagram](./images/csa-architecture-aw.png)
-
-
-
-## What resources are created?
-Main resources:
-- A parent folder for the PoC demo
-- A management folder to manage assured workload APIs and VPC-SC perimeter
-- IL4 Assured Workload
-- One sub-project for the workload (Compute, Storage and BigQuery)
-- One sub-project for KMS key
-
-
-
-## How to deploy?
-The following steps should be executed in Cloud Shell in the Google Cloud Console. 
-
-### 1. Get the code
-Clone this github repository go to the root of the repository.
-
-``` 
-git clone http://github.com/googlecloudplatform/csa-il4-assured-workload
-cd csa-il4-assured-workload
-```
-
-### 3. Deploy the infrastructure using Terraform
-
-From the csa-il4-assured-workload folder navigate to variable.tf file and update variables organization_id, billing_account and members for access in assured workload:
-
-```
-organization_id = “XXXXXXXXXXX”
-billing_account = “XXXX-XXXXXX-XXXXX”
-Members = [“user:name@domain.com”]
-```
-
-
-To find your  organization id and billing_id, run the following command: 
-```
-gcloud projects get-ancestors [ANY_PROJECT_ID_IN_ORG]
-gcloud alpha billing accounts list
-```
-
-While in the csa-il4-assured-workload, run the commands below in order. When prompted for confirmation enter “yes” to proceed.
-```
-terraform init
-terraform apply -target=data.google_projects.in_perimeter_folder
-terraform apply
-```
-If prompted, authorize the API call.
-
-**Note:** All the other variables are give a default value. If you wish to change, update the corresponding variables in variable.tf file.
-
-
-
-## How to clean-up?
-
-From the root folder of this repo, run the following command:
-```
-terraform destroy
-```
-
-
-
-
-
-
-
