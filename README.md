@@ -56,7 +56,6 @@ Sign in to your organization and assign yourself the following roles:
 1. Access Transparency Admin: roles/axt.admin
 2. Assured Workloads Admin: roles/assuredworkloads.admin
 3. Resource Manager Organization Viewer: roles/resourcemanager.organizationViewer
-4. Create Log Sinks: roles/logging.configWriter
 
 The following steps should be executed in Cloud Shell in the Google Cloud Console.
 
@@ -120,164 +119,6 @@ We also strongly recommend that you do not nest an Assured Workloads folder with
 
 We also recommend you set up logging and alerts for any changes to the Assured Workloads folder or according IAM permissions, including Org Admin changes. These alerts should be routed to an appropriate stakeholder other than Org Admin. This is because Org Admin can change the org level policies that are important for continuing compliance.
 
-# Operations
-
-## Logging
-
-Access Transparency is a part of Google's long-term commitment to transparency and user trust. Access Transparency logs record the actions that Google personnel take when accessing customer content.
-
-Access Transparency logs give you different information than Cloud Audit Logs. Cloud Audit Logs record the actions that members of your Google Cloud organization have taken in your Google Cloud resources, whereas Access Transparency logs record the actions taken by Google personnel. Google personnel are strictly restricted in what is visible to them. All access to customer content requires a valid justification. See [Justification Reason Codes](https://cloud.google.com/assured-workloads/access-transparency/docs/reading-logs#justification_reason_codes) for the list of valid business justifications.
-
-Access Transparency log entries include details such as the affected resource and action, the time of the action, the reason for the action, and information about the accessor. For the list of Google services that provide Access Transparency logs, see [Google services with Access Transparency logs](https://cloud.google.com/assured-workloads/access-transparency/docs/supported-services).
-
-## Monitoring, Alerting, and Reporting
-
-### Querying Access Transparency Logs
-
-Since Access Transparency logs are sent to Cloud Logging, we'll need to go to the Logs Explorer and build queries using the Logging Query Language. Overall, there are two ways to query for Access Transparency logs:
-
-Project Level
-
-```
-logName="projects/PROJECT-ID/logs/cloudaudit.googleapis.com%2Faccess_transparency"
-```
-
-Organization Level
-
-```
-logName="organizations/ORG-ID/logs/cloudaudit.googleapis.com%2Faccess_transparency"
-```
-
-This generates all of the Access Transparency logs within the time period specified in the query. Now, if you want the good stuff, the specific types of Access Transparency logs, add the specific reason type. For example, a query for the Access Transparency logs generated because of third-party data requests look like so:
-
-![image](./images/csa-deployingi--m4tepkb4pu.png)
-
-```
-logName="organizations/ORG-ID/logs/cloudaudit.googleapis.com%2Faccess_transparency"
-```
-
-You can also exclude certain types of reasons. So, for example, if you're looking for every type of log EXCEPT FOR third-party data requests, use the following query:
-
-![image](./images/csa-deployingi--7fk3e266tax.png)
-
-
-```
-logName="organizations/ORG-ID/logs/cloudaudit.googleapis.com%2Faccess_transparency"
-
-AND NOT
-
-jsonPayload.reason.type="THIRD_PARTY_DATA_REQUEST"
-```
-
-Querying Access Transparency logs with these levels of specificity is particularly useful for Security Operations Centers whose response to the event can vary based on the reason code. 
-
-### Org Policy Change Notifications
-
-Ensure any changes to your Assured Workloads Org Policies generate alerts that are pushed to your preferred notification channel
-
-#### Prerequisites 
-
-##### Logging Project
-
-Before starting, please ensure that you have a centralized logging project. If you don't already have one and need to create a logging project within your Assured Workloads folder, [please create one before proceeding.](https://cloud.google.com/logging/docs/central-log-storage)
-
-For the purposes of this guide, I've created a project and named it "IL4-Logging Project"
-
-![image](./images/csa-deployingi--zzg2np9n0xp.png)
-
-##### Log Bucket
-
-Within your logging project, [create a log bucket](https://cloud.google.com/logging/docs/buckets#create_bucket). I've named my bucket "folder-logs" and selected "US" as the region:
-
-![image](./images/csa-deployingi--1b2lcwjg3ij.png)
-
-##### Note the Log Bucket Path
-
-Take a note of your project name, the bucket location, and the bucket name as later on we will use the following path: 
-
-```
-logging.googleapis.com/projects/locations//buckets/
-```
-
-Based on my project ID, bucket location, and bucket name, my path will be:  
- 
-
-```
-logging.googleapis.com/projects/il4-logging-project/locations/us/buckets/folder-logs
-```
-
-#### Querying Org Policy Changes
-
-Customers can query all policy changes affecting their Assured Workloads folder by including the following query in the [Cloud Logging Explorer](https://console.cloud.google.com/logs/query?_ga=2.187681323.2041618581.1680814991-1422847751.1680725155): 
-
-```
-protoPayload.request.@type="type.googleapis.com/google.cloud.orgpolicy.v1.SetOrgPolicyRequest"
-
-OR
-
-protoPayload.request.@type="type.googleapis.com/google.cloud.orgpolicy.v1.clearOrgPolicyRequest"
-
-OR
-
-protoPayload.methodName="google.cloud.orgpolicy.v2.OrgPolicy.UpdatePolicy"
-
-OR
-
-protoPayload.methodName="google.cloud.orgpolicy.v2.OrgPolicy.DeletePolicy"
-```
-
-![image](./images/csa-deployingi--t3fm3vgjv8h.png)
-
-Notice that I am logged in at the Folder level (as indicated by the "IL4" selection next to the Google Cloud logo). If you are not conducting this query under the folder itself, you won't be able to see any results. 
-
-##### Pushing Folder Logs to the Logging Project
-
-1. Create a Log Sink based on this query - you can do so by clicking on "More Actions" and then "Create sink"
-
-![image](./images/csa-deployingi--t2dsj9f6vio.png)
-
-You should now be on a page named "Create logs routing sink". 
-
-1. Add your sink name, a description, and click "Next". 
-
-![image](./images/csa-deployingi--0tdbj9tphk4l.png)
-
-1. For the sink service, select "Logging Bucket". Include the bucket path from the [Note the Log Bucket Path](#heading=h.n54ul69qznbx) section. Click "Next".
-
-1. Choose the logs to include in the sink. I chose to "Include only logs ingested by this folder".
-
-1. Click "Done" and "Create Sink".
-
-##### Verify the Sink Works
-
-After a few minutes your folder logs should be visible in your logging project's log explorer. 
-
-1. Click on "Refine Scope" 
-
-![image](./images/csa-deployingi--1sh6ejsc2i2.png)
-
-1. Select "Scope by storage" and select all of the options. Note that this includes the log bucket we previously created - "FOLDER-LOGS" in the screenshot below. Click "Apply".
-
-![image](./images/csa-deployingi--rmjlwx1e8xs.png)
-
-1. You can then run a query - for completeness, I suggest running the same query in the first screenshot of the [Querying Org Policy Changes](#heading=h.g03vo6cvme8s) section.  
-
-#### Generating Alerts
-
-Now that we have all of our logs in a central place, we can create alerts to receive notifications of any org policy changes affecting our Assured Workloads folders. 
-
-1. Click "Create Alert" 
-
-![image](./images/csa-deployingi--56z0350bn8.png)
-
-1. Add your Alert Details and click next
-1. Step 2 - Choose logs to include in the alert - should already have the query. If not, recreate it: "folders/FOLDER_ID/policies". Then click next.
-1. Define the notification frequency and autoclose duration
-1. Add notification channels.
-1. Click save
-
-Check out [Configuring Log-Based Alerts](https://cloud.google.com/logging/docs/alerting/log-based-alerts) as configuring alerts based on particular log entries can help SOC teams engage the appropriate personnel in the incident response process. [Manage incidents for log-based alerts](https://cloud.google.com/logging/docs/alerting/log-based-incidents) can also assist in completing this cycle.
-
 # Governance, Risk Management, and Compliance
 
 ## Discover Compliance Violations
@@ -339,13 +180,10 @@ The cost estimate may change with time and may vary per region, please review th
 # Related Resources
 
 -  [Assured Workloads Quick Start Guide](https://services.google.com/fh/files/misc/assured_workloads_quick_start_guide_0423.pdf)
--  [Assured Workloads Impact Level 4 (IL4) Information](https://cloud.google.com/assured-workloads/docs/compliance-programs#il4)
+-  [Australia Regions with Assured Support Information](https://cloud.google.com/assured-workloads/docs/compliance-programs#aus-regions-support)
 -  [Personnel Data Access Controls](https://cloud.google.com/assured-workloads/docs/personnel-access-data-controls)
 -  [Control Data Access using Access Approval](https://cloud.google.com/assured-workloads/docs/access-approval)
--  [Supported Products - IL4](https://cloud.google.com/assured-workloads/docs/supported-products)
--  [VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/overview)
--  [Best Practices for Enabling VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/enable)
-
+-  [Supported Products](https://cloud.google.com/assured-workloads/docs/supported-products)
 # 
 
 
