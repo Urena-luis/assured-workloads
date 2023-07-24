@@ -7,9 +7,10 @@ This code creates a proof of concept demo environment for an Assured Workloads f
 
 # Summary
 
-Assured Workloads helps you comply with different regulatory compliance frameworks by implementing logical controls that segment networks and users from in-scope sensitive data. Many of the US compliance frameworks are built upon NIST SP 800-53 Rev. 5, but add on controls based on the sensitivity of the information and the framework's governing body. 
+Assured Workloads helps you comply with different regulatory compliance frameworks by implementing logical controls that segment networks and users from in-scope sensitive data.Core to our strategy for Assured Workloads is to build security and compliance controls as software. Software allows us to scale globally and combine technologies to help our customers achieve specific compliance outcomes. 
+This approach has enabled us to make Assured Workloads available in more countries, and expand the list of available services across multiple compliance frameworks. As a result, Assured Workloads can help organizations more easily achieve and maintain compliance with relevant regimes around the world without refactoring.
 
-This guide will provide written instructions and Terraform/Python code for creating an Assured Workloads folder for a FedRAMP Moderate compliance framework
+This guide will provide written instructions and Terraform code for creating an Assured Workloads folder for an Australian-based workload.
 
 # Architecture 
 
