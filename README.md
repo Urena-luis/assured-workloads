@@ -3,18 +3,13 @@ This is not an officially supported Google product.
 This code creates PoC demo environment for CSA IL4 Assured Workload with VPC service perimeter. This demo code is not built for production workload. 
 ```
 
-# Deploying IL4 Assured Workloads Architecture Guide
+# Compliance in Australia with Assured Workloads Architecture Guide
 
 # Summary
 
-Assured Workloads helps you comply with different regulatory compliance frameworks by implementing logical controls that segment networks and users from in-scope sensitive data. Many of the US compliance frameworks are built upon NIST SP 800-53 Rev. 5, but add on controls based on the sensitivity of the information and the framework's governing body. For customers who must comply with Department of Defense (DoD) Impact Level 4 ("IL4"), we recommend that you use [VPC Service Controls (VPC-SC)](https://cloud.google.com/vpc-service-controls/docs/overview) to create a strong boundary around the regulated environment.
+Assured Workloads helps you comply with different regulatory compliance frameworks by implementing logical controls that segment networks and users from in-scope sensitive data. Many of the US compliance frameworks are built upon NIST SP 800-53 Rev. 5, but add on controls based on the sensitivity of the information and the framework's governing body. 
 
-This guide will provide written instructions and Terraform/Python code for:
-
-1. Creating an Assured Workloads folder for an IL4 compliance framework
-1. Setting up a VPC-SC perimeter around the Assured Workloads IL4 boundary
-1. Adding new projects to the VPC-SC perimeter, both manually and via automation
-1. Setting up Access Context Manager policy to enforce data residency controls for developers
+This guide will provide written instructions and Terraform/Python code for creating an Assured Workloads folder for a FedRAMP Moderate compliance framework
 
 # Architecture 
 
@@ -24,30 +19,21 @@ This guide will provide written instructions and Terraform/Python code for:
 
 ## Product and services
 
-[Assured Workloads](https://cloud.google.com/assured-workloads) provides Google Cloud customers with the ability to apply security controls to an environment  in support of compliance requirements without compromising the quality of their cloud experience. The United States' DoD Defense Information Systems Agency (DISA) uses an IL classification system to classify data and authorize cloud environments. IL4 is among the highest level of authorization granted to environments storing and processing Controlled Unclassified Information (CUI), mission-critical information, and national security systems information. Assured Workloads supports workloads requiring IL4 compliance by adding guardrails that ensure customers:
-
-1. May only use GCP services  granted IL4 Provisional Authorization by the DoD
-1. Store and process data in [US-only regions](https://cloud.google.com/assured-workloads/docs/locations#us_regions)
-1. Receive support from IL4-adjudicated first- and second-level staff who are US Persons located in the US
-
-[VPC Service Controls](https://cloud.google.com/vpc-service-controls) (VPC-SC) provides an extra layer of security defense for Google Cloud services that is independent of [Identity and Access Management (IAM)](https://cloud.google.com/iam/docs/). While Identity and Access Management enables granular identity-based access control, VPC-SC enables broader context-based perimeter security, such as controlling data ingress and egress across the perimeter. VPC-SC adds a logical boundary around Google Cloud APIs that are managed at the organization level and applied and enforced at the project level. 
+[Assured Workloads](https://cloud.google.com/assured-workloads) provides Google Cloud customers with the ability to apply security controls to an environment  in support of compliance requirements without compromising the quality of their cloud experience. Australia Regions with Assured Support enforces data residency for customer data at-rest to our two cloud regions in Australia (Sydney and Melbourne). It’s coupled with our new Assured Support service, which means that customer support will be provided from only five countries (United States, Australia, Canada, New Zealand, and the United Kingdom). 
 
 Before proceeding with this guide, you should:
 
--  Ensure that you've read and understand the [purpose and usage of VPC-SC](https://cloud.google.com/vpc-service-controls/docs/overview) and its [service perimeters](https://cloud.google.com/vpc-service-controls/docs/service-perimeters).
--  Ensure that the Google Cloud services you are planning to use are [in scope for IL4](https://cloud.google.com/assured-workloads/docs/supported-products) **and** are supported by [VPC-SC](https://cloud.google.com/vpc-service-controls/docs/supported-products).
+-  Ensure that the Google Cloud services you are planning to use are [in scope for Australia Regions with Assured Support](https://cloud.google.com/assured-workloads/docs/supported-products)
 
 ## Design considerations
 
-Because VPC-SC protection affects cloud services functionality, we recommend that you plan the enablement of VPC-SC in advance, and consider VPC Service Controls during architecture design. It's important to keep VPC-SC design as simple as possible. We recommend that you avoid perimeter designs that use multiple bridges, perimeter network projects or a DMZ perimeter, and complex access levels. Read more about designing and architecting service perimeters [here](https://cloud.google.com/vpc-service-controls/docs/architect-perimeters).
-
-Assured Workloads folders modify Google Cloud's inherent global infrastructure to deliver products and services with IL4 compliance requirements by adjusting Google Cloud products' global behavior and access paths. This includes disabling global APIs, including the products' underlying dependencies, to provide data residency in alignment with IL4 requirements. Customers are still responsible for configuring IAM permissions, networking, and GCP services to meet IL4 compliance. Before deploying an IL4 Assured Workload, we recommend you familiarize yourself with IL4 requirements for these levels. 
+Assured Workloads folders modify Google Cloud's inherent global infrastructure to deliver products and services with FedRAMP High compliance requirements by adjusting Google Cloud products' global behavior and access paths. This includes disabling global APIs, including the products' underlying dependencies, to provide data residency. Customers are still responsible for configuring IAM permissions, networking, and GCP services to meet their compliance requirements.
 
 ## Prerequisites
 
 ### Assured Workloads
 
-Before proceeding, it is important to understand that IL4 is a [Premium Platform Control.](https://cloud.google.com/assured-workloads/docs/concept-platform-controls#premium_tier) Platform Controls are a combination of Google Cloud infrastructure data location and personnel access primitives that support compliance by enforcing and restricting access by customers or Google personnel. To launch a Premium Platform Control, you must:
+Before proceeding, it is important to understand that Asutralia Regions with Assured Support is a [Premium Platform Control.](https://cloud.google.com/assured-workloads/docs/concept-platform-controls#premium_tier) Platform Controls are a combination of Google Cloud infrastructure data location and personnel access primitives that support compliance by enforcing and restricting access by customers or Google personnel. To launch a Premium Platform Control, you must:
 
 -  Ensure you have [Enhanced or Premium Support ](https://cloud.google.com/support)
 -  [Enable Access Transparency](https://cloud.google.com/cloud-provider-access-management/access-transparency/docs/enable)
@@ -63,31 +49,21 @@ Many Google Cloud services send out notifications to share important information
 
 We recommend adding three Contacts for the Legal category: representatives from your Legal, Compliance, and Security departments. **This group will receive notifications of compliance violations**, so this will ensure that Legal and Compliance remain informed, and acts as an immediate notification to Security for remediation actions. We also recommend that you enact a plan of action for addressing these alerts.
 
-### VPC Service Controls
-
--  Read about[ configuring service perimeters](https://cloud.google.com/vpc-service-controls/docs/service-perimeters).
--  Read about [management of VPC networks in service perimeters](https://cloud.google.com/vpc-service-controls/docs/vpc-perimeters-management).
--  Read about [granting access to VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/access-control).
--  If you want to configure external access to your protected services when you create your perimeter, [first create one or more access levels](https://cloud.google.com/access-context-manager/docs/create-access-level) before you create the perimeter.
-
 # Deployment
 
 ## Terraform Deployment Instructions
-
-1. Sign in to your organization and assign yourself the following roles:
-
+Sign in to your organization and assign yourself the following roles: 
 1. Access Transparency Admin: roles/axt.admin
-1. Assured Workloads Admin: roles/assuredworkloads.admin
-1. Resource Manager Organization Viewer: roles/resourcemanager.organizationViewer
-1. VPC Service Controls: roles/accesscontextmanager.policyAdmin
-1. Create Log Sinks: roles/logging.configWriter
+2. Assured Workloads Admin: roles/assuredworkloads.admin
+3. Resource Manager Organization Viewer: roles/resourcemanager.organizationViewer
+4. Create Log Sinks: roles/logging.configWriter
 
 The following steps should be executed in Cloud Shell in the Google Cloud Console.
 
-1. To deploy the architecture open up Cloud shell and clone the [git repository](https://github.com/mgaur10/csa-il4-assured-workload) using the command below.
+1. To deploy the architecture open up Cloud shell and clone the [git repository](https://github.com/Urena-luis/assured-workloads) using the command below.
 
 ```
-git clone https://github.com/mgaur10/csa-il4-assured-workload
+git clone https://github.com/Urena-Luis/assured-workloads
 ```
 
 1. Navigate to the csa-il4-assured-workload folder.
