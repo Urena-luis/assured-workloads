@@ -66,13 +66,13 @@ The following steps should be executed in Cloud Shell in the Google Cloud Consol
 git clone https://github.com/Urena-Luis/assured-workloads
 ```
 
-1. Navigate to the csa-il4-assured-workload folder.
+1. Navigate to the assured-workloads-australia folder.
 
 ```
-cd csa-il4-assured-workload
+cd assured-workloads-australia
 ```
 
-1. In the csa-il4-assured-workload folder navigate to variable.tf file and update variables organization_id, billing_account and members for access in assured workload.
+1. In the assured-workloads-australia folder navigate to variable.tf file and update variables organization_id, billing_account and members for access in assured workload.
 
 ```
 organization_id = "XXXXXXXXXXX"
@@ -92,7 +92,7 @@ gcloud projects get-ancestors [ANY_PROJECT_ID_IN_ORG]
 gcloud alpha billing accounts list
 ```
 
-1. While in the csa-il4-assured-workload, run the commands below in order. When prompted for confirmation enter "yes" to proceed.
+1. While in the assured-workloads-australia, run the commands below in order. When prompted for confirmation enter "yes" to proceed.
 
 ```
 terraform init
@@ -106,7 +106,7 @@ terraform apply
 
 1. Once deployment is finished it will publish the output summary of assets orchestrated. It deploys the resources within 10 minutes.
 
-1.  After completing the demo, navigate to the csa-il4-assured-workload folder and run the command below to destroy all resources.
+1.  After completing the demo, navigate to the assured-workloads-australia folder and run the command below to destroy all resources.
 
 ```
  terraform destroy
