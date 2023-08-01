@@ -14,8 +14,8 @@ This guide will provide written instructions and Terraform code for creating an 
 
 This guide will provide written instructions and Terraform/Python code for:
 
-1. Creating an Assured Workloads folder for an IL4 compliance framework
-2. Setting up a VPC-SC perimeter around the Assured Workloads IL4 boundary
+1. Creating an Assured Workloads folder for an an Australian compliance use case
+2. Setting up a VPC-SC perimeter around the Assured Workloads boundary
 3. Adding new projects to the VPC-SC perimeter, both manually and via automation
 4. Setting up Access Context Manager policy to enforce data residency controls for developers
 
@@ -23,7 +23,7 @@ This guide will provide written instructions and Terraform/Python code for:
 
 ## Design Diagram
 
-![image](./images/csa-deployingi--vcuh7f2372.png)
+![image](./images/architecture-diagram.png)
 
 ## Product and services
 
