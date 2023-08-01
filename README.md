@@ -185,7 +185,7 @@ Google Cloud supports multiple TLS protocol versions. To meet compliance require
   <tbody>
     <tr>
       <td>Assured Workloads </td>
-      <td>Premium Subscription, IL4</td>
+      <td>Premium Subscription</td>
       <td>20% uplift based on spend within the Assured Workloads folder</td>
     </tr>
     <tr>
