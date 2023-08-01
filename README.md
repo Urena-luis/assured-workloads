@@ -185,8 +185,13 @@ Google Cloud supports multiple TLS protocol versions. To meet compliance require
   <tbody>
     <tr>
       <td>Assured Workloads </td>
-      <td>Premium Subscription</td>
+      <td>Premium Subscription, IL4</td>
       <td>20% uplift based on spend within the Assured Workloads folder</td>
+    </tr>
+    <tr>
+      <td>VPC Service Controls</td>
+      <td></td>
+      <td>Free</td>
     </tr>
   </tbody>
 </table>
@@ -200,4 +205,6 @@ The cost estimate may change with time and may vary per region, please review th
 -  [Personnel Data Access Controls](https://cloud.google.com/assured-workloads/docs/personnel-access-data-controls)
 -  [Control Data Access using Access Approval](https://cloud.google.com/assured-workloads/docs/access-approval)
 -  [Supported Products](https://cloud.google.com/assured-workloads/docs/supported-products)
+-  [VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/overview)
+-  [Best Practices for Enabling VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/enable)
 # 
