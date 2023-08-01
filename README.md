@@ -7,10 +7,17 @@ This code creates a proof of concept demo environment for an Assured Workloads f
 
 # Summary
 
-Assured Workloads helps you comply with different regulatory compliance frameworks by implementing logical controls that segment networks and users from in-scope sensitive data.Core to our strategy for Assured Workloads is to build security and compliance controls as software. Software allows us to scale globally and combine technologies to help our customers achieve specific compliance outcomes. 
+Assured Workloads helps you comply with different regulatory compliance frameworks by implementing logical controls that segment networks and users from in-scope sensitive data. Core to our strategy for Assured Workloads is to build security and compliance controls as software. Software allows us to scale globally and combine technologies to help our customers achieve specific compliance outcomes. 
 This approach has enabled us to make Assured Workloads available in more countries, and expand the list of available services across multiple compliance frameworks. As a result, Assured Workloads can help organizations more easily achieve and maintain compliance with relevant regimes around the world without refactoring.
 
-This guide will provide written instructions and Terraform code for creating an Assured Workloads folder for an Australian-based workload.
+This guide will provide written instructions and Terraform code for creating an Assured Workloads folder for an Australian-based workload. We recommend that you use VPC Service Controls (VPC-SC) to create a strong boundary around the regulated environment.
+
+This guide will provide written instructions and Terraform/Python code for:
+
+1. Creating an Assured Workloads folder for an IL4 compliance framework
+2. Setting up a VPC-SC perimeter around the Assured Workloads IL4 boundary
+3. Adding new projects to the VPC-SC perimeter, both manually and via automation
+4. Setting up Access Context Manager policy to enforce data residency controls for developers
 
 # Architecture 
 
@@ -22,11 +29,17 @@ This guide will provide written instructions and Terraform code for creating an 
 
 [Assured Workloads](https://cloud.google.com/assured-workloads) provides Google Cloud customers with the ability to apply security controls to an environment  in support of compliance requirements without compromising the quality of their cloud experience. Australia Regions with Assured Support enforces data residency for customer data at-rest to our two cloud regions in Australia (Sydney and Melbourne). It’s coupled with our new Assured Support service, which means that customer support will be provided from only five countries (United States, Australia, Canada, New Zealand, and the United Kingdom). 
 
+[VPC Service Controls](https://cloud.google.com/vpc-service-controls) (VPC-SC) provides an extra layer of security defense for Google Cloud services that is independent of [Identity and Access Management (IAM)](https://cloud.google.com/iam/docs/). While Identity and Access Management enables granular identity-based access control, VPC-SC enables broader context-based perimeter security, such as controlling data ingress and egress across the perimeter. VPC-SC adds a logical boundary around Google Cloud APIs that are managed at the organization level and applied and enforced at the project level. 
+
 Before proceeding with this guide, you should:
 
 -  Ensure that the Google Cloud services you are planning to use are [in scope for Australia Regions with Assured Support](https://cloud.google.com/assured-workloads/docs/supported-products)
+-  Ensure that you've read and understand the [purpose and usage of VPC-SC](https://cloud.google.com/vpc-service-controls/docs/overview) and its [service perimeters](https://cloud.google.com/vpc-service-controls/docs/service-perimeters).
+
 
 ## Design considerations
+
+Because VPC-SC protection affects cloud services functionality, we recommend that you plan the enablement of VPC-SC in advance, and consider VPC Service Controls during architecture design. It's important to keep VPC-SC design as simple as possible. We recommend that you avoid perimeter designs that use multiple bridges, perimeter network projects or a DMZ perimeter, and complex access levels. Read more about designing and architecting service perimeters [here](https://cloud.google.com/vpc-service-controls/docs/architect-perimeters).
 
 Assured Workloads folders modify Google Cloud's inherent global infrastructure to deliver products and services with FedRAMP High compliance requirements by adjusting Google Cloud products' global behavior and access paths. This includes disabling global APIs, including the products' underlying dependencies, to provide data residency. Customers are still responsible for configuring IAM permissions, networking, and GCP services to meet their compliance requirements.
 
@@ -50,6 +63,13 @@ Many Google Cloud services send out notifications to share important information
 
 We recommend adding three Contacts for the Legal category: representatives from your Legal, Compliance, and Security departments. **This group will receive notifications of compliance violations**, so this will ensure that Legal and Compliance remain informed, and acts as an immediate notification to Security for remediation actions. We also recommend that you enact a plan of action for addressing these alerts.
 
+### VPC Service Controls
+
+-  Read about[ configuring service perimeters](https://cloud.google.com/vpc-service-controls/docs/service-perimeters).
+-  Read about [management of VPC networks in service perimeters](https://cloud.google.com/vpc-service-controls/docs/vpc-perimeters-management).
+-  Read about [granting access to VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/access-control).
+-  If you want to configure external access to your protected services when you create your perimeter, [first create one or more access levels](https://cloud.google.com/access-context-manager/docs/create-access-level) before you create the perimeter.
+
 # Deployment
 
 ## Terraform Deployment Instructions
@@ -57,6 +77,8 @@ Sign in to your organization and assign yourself the following roles:
 1. Access Transparency Admin: roles/axt.admin
 2. Assured Workloads Admin: roles/assuredworkloads.admin
 3. Resource Manager Organization Viewer: roles/resourcemanager.organizationViewer
+4. VPC Service Controls: roles/accesscontextmanager.policyAdmin
+5. Create Log Sinks: roles/logging.configWriter
 
 The following steps should be executed in Cloud Shell in the Google Cloud Console.
 
